@@ -27,7 +27,8 @@
             border-color: #666;
         }
         body.dark h1,
-        body.dark h2 {
+        body.dark h2,
+        body.dark #pulkstenis {
             color: #eee;
         }
         .saturs {
@@ -39,6 +40,11 @@
             transition: all 0.3s;
         }
         h1 { color: #333; }
+        #pulkstenis {
+            font-size: 18px;
+            color: #666;
+            margin: 0 0 10px;
+        }
         input, textarea {
             width: 100%;
             padding: 10px;
@@ -79,6 +85,7 @@
 
     <div class="saturs">
         <h1>Sveiki visiem!</h1>
+        <p id="pulkstenis"></p>
         <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500" alt="Mana bilde" style="width:100%; border-radius:10px; margin:10px 0;">
         <h2>Raksti man!</h2>
         <input type="text" placeholder="Tavs vārds">
@@ -97,6 +104,18 @@
                 btn.textContent = '🌙 Tumšais';
             }
         }
+
+        function atjaunotLaiku() {
+            const tagad = new Date();
+            const dienas = ['Svētdiena','Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena'];
+            const diena = dienas[tagad.getDay()];
+            const datums = tagad.toLocaleDateString('lv-LV');
+            const laiks = tagad.toLocaleTimeString('lv-LV');
+            document.getElementById('pulkstenis').textContent = diena + ', ' + datums + ' | ' + laiks;
+        }
+
+        atjaunotLaiku();
+        setInterval(atjaunotLaiku, 1000);
     </script>
 </body>
 </html>
