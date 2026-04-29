@@ -40,11 +40,7 @@
             transition: all 0.3s;
         }
         h1 { color: #333; }
-        #pulkstenis {
-            font-size: 18px;
-            color: #666;
-            margin: 0 0 10px;
-        }
+        #pulkstenis { font-size: 18px; color: #666; margin: 0 0 10px; }
         input, textarea {
             width: 100%;
             padding: 10px;
@@ -65,14 +61,11 @@
             margin-top: 5px;
         }
         button:hover { background: #45a049; }
-        .poga-zila {
-            background: #2196F3;
-        }
+        .poga-zila { background: #2196F3; }
         .poga-zila:hover { background: #1976D2; }
         #dark-toggle {
             position: fixed;
-            top: 15px;
-            right: 15px;
+            top: 15px; right: 15px;
             background: rgba(0,0,0,0.6);
             color: white;
             border: none;
@@ -88,39 +81,34 @@
 </head>
 <body>
     <button id="dark-toggle" onclick="toggleDark()">🌙 Tumšais</button>
-
     <div class="saturs">
         <h1>Sveiki visiem!</h1>
         <p id="pulkstenis"></p>
         <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500" alt="Mana bilde" style="width:100%; border-radius:10px; margin:10px 0;">
         <a href="par-mani.html"><button class="poga-zila">Par mani →</button></a>
+        <a href="galerija.html"><button class="poga-zila">🖼️ Galerija →</button></a>
         <h2>Raksti man!</h2>
         <input type="text" placeholder="Tavs vārds">
         <input type="email" placeholder="Tavs e-pasts">
         <textarea rows="4" placeholder="Tavs ziņojums..."></textarea>
         <button>Nosūtīt</button>
     </div>
-
     <script>
         function toggleDark() {
             document.body.classList.toggle('dark');
-            const btn = document.getElementById('dark-toggle');
-            if (document.body.classList.contains('dark')) {
-                btn.textContent = '☀️ Gaišais';
-            } else {
-                btn.textContent = '🌙 Tumšais';
-            }
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark);
+            document.getElementById('dark-toggle').textContent = isDark ? '☀️ Gaišais' : '🌙 Tumšais';
         }
-
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+            document.getElementById('dark-toggle').textContent = '☀️ Gaišais';
+        }
         function atjaunotLaiku() {
             const tagad = new Date();
             const dienas = ['Svētdiena','Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena'];
-            const diena = dienas[tagad.getDay()];
-            const datums = tagad.toLocaleDateString('lv-LV');
-            const laiks = tagad.toLocaleTimeString('lv-LV');
-            document.getElementById('pulkstenis').textContent = diena + ', ' + datums + ' | ' + laiks;
+            document.getElementById('pulkstenis').textContent = dienas[tagad.getDay()] + ', ' + tagad.toLocaleDateString('lv-LV') + ' | ' + tagad.toLocaleTimeString('lv-LV');
         }
-
         atjaunotLaiku();
         setInterval(atjaunotLaiku, 1000);
     </script>
