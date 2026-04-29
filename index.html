@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mana lapa</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
             background-image: url("https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200");
             background-size: cover;
@@ -16,101 +15,109 @@
             background-attachment: fixed;
             transition: all 0.3s;
         }
-        body.dark .saturs {
-            background: rgba(30, 30, 30, 0.92);
-            color: #eee;
+        body.dark .saturs { background: rgba(20,20,30,0.95); color: #eee; }
+        body.dark input, body.dark textarea { background: #2a2a3a; color: #eee; border-color: #555; }
+        body.dark h1, body.dark h2, body.dark #pulkstenis, body.dark p { color: #eee; }
+        body.dark .nav { background: rgba(10,10,20,0.95); }
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px; z-index: 100;
         }
-        body.dark input,
-        body.dark textarea {
-            background: #444;
-            color: #eee;
-            border-color: #666;
-        }
-        body.dark h1,
-        body.dark h2,
-        body.dark #pulkstenis {
-            color: #eee;
-        }
+        .nav-logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 15px; opacity: 0.85; transition: opacity 0.2s; }
+        .nav-links a:hover { opacity: 1; }
         .saturs {
-            background: rgba(255, 255, 255, 0.88);
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            border-radius: 15px;
-            transition: all 0.3s;
-        }
-        h1 { color: #333; }
-        #pulkstenis { font-size: 18px; color: #666; margin: 0 0 10px; }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            transition: all 0.3s;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 5px;
-        }
-        button:hover { background: #45a049; }
-        .poga-zila { background: #2196F3; }
-        .poga-zila:hover { background: #1976D2; }
-        #dark-toggle {
-            position: fixed;
-            top: 15px; right: 15px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            border: none;
-            padding: 8px 16px;
+            background: rgba(255,255,255,0.92);
+            max-width: 520px;
+            margin: 100px auto 50px;
+            padding: 40px;
             border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-            width: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: all 0.3s;
         }
-        #dark-toggle:hover { background: rgba(0,0,0,0.8); }
-        a { text-decoration: none; }
+        h1 { color: #222; font-size: 28px; margin-bottom: 4px; }
+        h2 { color: #333; font-size: 20px; margin: 20px 0 10px; }
+        #pulkstenis { font-size: 14px; color: #888; margin-bottom: 16px; }
+        img.hero { width: 100%; border-radius: 12px; margin: 12px 0 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        input, textarea {
+            width: 100%; padding: 12px 14px; margin: 6px 0;
+            border: 1.5px solid #ddd; border-radius: 10px;
+            font-size: 15px; transition: all 0.2s; background: #fafafa;
+        }
+        input:focus, textarea:focus {
+            outline: none; border-color: #667eea;
+            background: white; box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+        .btn {
+            display: block; width: 100%; padding: 12px;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-top: 8px; text-align: center; text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .btn-zala { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a1a; }
+        .btn-zila { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-viola { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        #dark-toggle {
+            position: fixed; top: 60px; right: 16px;
+            background: rgba(255,255,255,0.15); color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 14px; border-radius: 20px;
+            cursor: pointer; font-size: 14px; z-index: 200;
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
-    <button id="dark-toggle" onclick="toggleDark()">🌙 Tumšais</button>
+    <nav class="nav">
+        <a class="nav-logo" href="index.html">🌿 Mana lapa</a>
+        <div class="nav-links">
+            <a href="index.html">Sākums</a>
+            <a href="par-mani.html">Par mani</a>
+            <a href="galerija.html">Galerija</a>
+        </div>
+    </nav>
+    <button id="dark-toggle" onclick="toggleDark()">🌙</button>
     <div class="saturs">
-        <h1>Sveiki visiem!</h1>
+        <h1>Sveiki visiem! 👋</h1>
         <p id="pulkstenis"></p>
-        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500" alt="Mana bilde" style="width:100%; border-radius:10px; margin:10px 0;">
-        <a href="par-mani.html"><button class="poga-zila">Par mani →</button></a>
-        <a href="galerija.html"><button class="poga-zila">🖼️ Galerija →</button></a>
+        <img class="hero" src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500" alt="Ainava">
+        <a href="par-mani.html" class="btn btn-zila">Par mani →</a>
+        <a href="galerija.html" class="btn btn-viola">🖼️ Galerija →</a>
         <h2>Raksti man!</h2>
         <input type="text" placeholder="Tavs vārds">
         <input type="email" placeholder="Tavs e-pasts">
         <textarea rows="4" placeholder="Tavs ziņojums..."></textarea>
-        <button>Nosūtīt</button>
+        <button class="btn btn-zala" onclick="nosutit()">Nosūtīt ✉️</button>
+        <p id="zinojums" style="text-align:center; margin-top:10px; color:green; font-weight:600; display:none;">✅ Ziņojums nosūtīts!</p>
     </div>
     <script>
         function toggleDark() {
             document.body.classList.toggle('dark');
             const isDark = document.body.classList.contains('dark');
             localStorage.setItem('darkMode', isDark);
-            document.getElementById('dark-toggle').textContent = isDark ? '☀️ Gaišais' : '🌙 Tumšais';
+            document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
         }
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark');
-            document.getElementById('dark-toggle').textContent = '☀️ Gaišais';
+            document.getElementById('dark-toggle').textContent = '☀️';
         }
         function atjaunotLaiku() {
-            const tagad = new Date();
-            const dienas = ['Svētdiena','Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena'];
-            document.getElementById('pulkstenis').textContent = dienas[tagad.getDay()] + ', ' + tagad.toLocaleDateString('lv-LV') + ' | ' + tagad.toLocaleTimeString('lv-LV');
+            const t = new Date();
+            const d = ['Svētdiena','Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena'];
+            document.getElementById('pulkstenis').textContent = d[t.getDay()] + ', ' + t.toLocaleDateString('lv-LV') + ' | ' + t.toLocaleTimeString('lv-LV');
         }
         atjaunotLaiku();
         setInterval(atjaunotLaiku, 1000);
+        function nosutit() {
+            const z = document.getElementById('zinojums');
+            z.style.display = 'block';
+            setTimeout(() => z.style.display = 'none', 3000);
+        }
     </script>
 </body>
 </html>

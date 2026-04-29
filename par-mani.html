@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Par mani</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
             background-image: url("https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200");
             background-size: cover;
@@ -16,70 +15,87 @@
             background-attachment: fixed;
             transition: all 0.3s;
         }
-        body.dark .saturs {
-            background: rgba(30, 30, 30, 0.92);
-            color: #eee;
-        }
+        body.dark .saturs { background: rgba(20,20,30,0.95); color: #eee; }
         body.dark h1, body.dark p { color: #eee; }
+        body.dark .nav { background: rgba(10,10,20,0.95); }
+        body.dark .karte { background: rgba(40,40,60,0.9); color: #eee; }
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px; z-index: 100;
+        }
+        .nav-logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 15px; opacity: 0.85; transition: opacity 0.2s; }
+        .nav-links a:hover { opacity: 1; }
         .saturs {
-            background: rgba(255, 255, 255, 0.88);
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            border-radius: 15px;
+            background: rgba(255,255,255,0.92);
+            max-width: 520px;
+            margin: 100px auto 50px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             transition: all 0.3s;
         }
-        h1 { color: #333; }
-        p { color: #555; line-height: 1.6; }
-        button {
-            background: #2196F3;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
+        h1 { color: #222; font-size: 28px; margin-bottom: 20px; }
+        .prasmes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .karte {
+            background: rgba(102,126,234,0.1);
+            border-radius: 12px; padding: 16px;
+            text-align: center; font-size: 15px; transition: all 0.3s;
         }
-        button:hover { background: #1976D2; }
+        .karte:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        .karte span { font-size: 28px; display: block; margin-bottom: 6px; }
+        .btn {
+            display: block; width: 100%; padding: 12px;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-top: 8px; text-align: center; text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .btn-zila { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
         #dark-toggle {
-            position: fixed;
-            top: 15px; right: 15px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-            width: auto;
+            position: fixed; top: 60px; right: 16px;
+            background: rgba(255,255,255,0.15); color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 14px; border-radius: 20px;
+            cursor: pointer; font-size: 14px; z-index: 200;
         }
-        a { text-decoration: none; }
     </style>
 </head>
 <body>
-    <button id="dark-toggle" onclick="toggleDark()">🌙 Tumšais</button>
+    <nav class="nav">
+        <a class="nav-logo" href="index.html">🌿 Mana lapa</a>
+        <div class="nav-links">
+            <a href="index.html">Sākums</a>
+            <a href="par-mani.html">Par mani</a>
+            <a href="galerija.html">Galerija</a>
+        </div>
+    </nav>
+    <button id="dark-toggle" onclick="toggleDark()">🌙</button>
     <div class="saturs">
         <h1>Par mani 👋</h1>
-        <p>Sveiki! Es esmu praktikants kas mācās web izstrādi.</p>
-        <p>Šobrīd mācos:</p>
-        <p>💻 HTML — lapas struktūra</p>
-        <p>🎨 CSS — dizains un izskats</p>
-        <p>⚡ JavaScript — pogas un animācijas</p>
-        <p>🔧 Git — koda saglabāšana</p>
-        <br>
-        <a href="index.html"><button>← Atpakaļ uz sākumu</button></a>
+        <p style="color:#555; line-height:1.7; margin-bottom:10px;">Sveiki! Es esmu praktikants kas mācās web izstrādi. Šobrīd apgūstu pamatus un veidoju savus pirmos projektus.</p>
+        <div class="prasmes">
+            <div class="karte"><span>💻</span>HTML</div>
+            <div class="karte"><span>🎨</span>CSS</div>
+            <div class="karte"><span>⚡</span>JavaScript</div>
+            <div class="karte"><span>🔧</span>Git</div>
+        </div>
+        <a href="index.html" class="btn btn-zila">← Atpakaļ uz sākumu</a>
     </div>
     <script>
         function toggleDark() {
             document.body.classList.toggle('dark');
             const isDark = document.body.classList.contains('dark');
             localStorage.setItem('darkMode', isDark);
-            document.getElementById('dark-toggle').textContent = isDark ? '☀️ Gaišais' : '🌙 Tumšais';
+            document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
         }
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark');
-            document.getElementById('dark-toggle').textContent = '☀️ Gaišais';
+            document.getElementById('dark-toggle').textContent = '☀️';
         }
     </script>
 </body>
