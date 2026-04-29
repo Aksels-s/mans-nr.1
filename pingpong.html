@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            background-image: url("https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px; z-index: 100;
+        }
+        .nav-logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 15px; opacity: 0.85; }
+        .nav-links a:hover { opacity: 1; }
+        .saturs {
+            background: rgba(255,255,255,0.92);
+            max-width: 460px;
+            margin: 100px auto 50px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 { color: #222; font-size: 26px; margin-bottom: 10px; }
+        .rezultats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 12px;
+        }
+        .tu { color: #667eea; }
+        .dators { color: #f5576c; }
+        canvas {
+            border: 3px solid #667eea;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+            background: #1a1a2e;
+        }
+        .pogas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .poga {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+            color: white;
+        }
+        .poga:active { transform: scale(0.95); }
+        .poga-up { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .poga-down { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .poga-start {
+            grid-column: span 2;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: #1a1a1a;
+        }
+        .btn {
+            display: block; width: 100%; padding: 12px;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-top: 12px; text-align: center; text-decoration: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; transition: transform 0.15s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .vadiba-info { font-size: 12px; color: #888; margin-top: 8px; }
+        #zinojums {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 8px 0;
+            min-height: 24px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a class="nav-logo" href="index.html">🌿 Mana lapa</a>
+        <div class="nav-links">
+            <a href="index.html">Sākums</a>
+            <a href="par-mani.html">Par mani</a>
+            <a href="galerija.html">Galerija</a>
+            <a href="tetris.html">Tetris</a>
+        </div>
+    </nav>
+
+    <div class="saturs">
+        <h1>🎾 Ping Pong</h1>
+        <div class="rezultats">
+            <span class="tu">Tu: <span id="punkti-tu">0</span></span>
+            <span class="dators">Dators: <span id="punkti-dators">0</span></span>
+        </div>
+        <p id="zinojums">Nospied "Sākt spēli"!</p>
+        <canvas id="spele" width="400" height="300"></canvas>
+        <div class="pogas">
+            <button class="poga poga-up" onmousedown="aug=true" onmouseup="aug=false" ontouchstart="aug=true" ontouchend="aug=false">▲ Uz augšu</button>
+            <button class="poga poga-down" onmousedown="lejup=true" onmouseup="lejup=false" ontouchstart="lejup=true" ontouchend="lejup=false">▼ Uz leju</button>
+            <button class="poga-start" onclick="sakit()">▶ Sākt spēli</button>
+        </div>
+        <p class="vadiba-info">Tastatūra: ↑ ↓ vai W / S</p>
+        <a href="index.html" class="btn">← Atpakaļ uz sākumu</a>
+    </div>
+
+    <script>
+        const c = document.getElementById('spele');
+        const ctx = c.getContext('2d');
+        const P = { x: 10, y: 120, w: 10, h: 60, atrs: 4 };
+        const D = { x: 380, y: 120, w: 10, h: 60, atrs: 2.5 };
+        const B = { x: 200, y: 150, r: 8, dx: 2.5, dy: 2 };
+        let punktiTu = 0, punktiDators = 0;
+        let spele = false, aug = false, lejup = false;
+        let animId;
+
+        function sakit() {
+            punktiTu = 0; punktiDators = 0;
+            atjaunotPunkti();
+            B.x = 200; B.y = 150;
+            B.dx = 2.5 * (Math.random() > 0.5 ? 1 : -1);
+            B.dy = 2 * (Math.random() > 0.5 ? 1 : -1);
+            P.y = 120; D.y = 120;
+            spele = true;
+            document.getElementById('zinojums').textContent = '🎮 Spēle sākusies!';
+            cancelAnimationFrame(animId);
+            zimetVisu();
+        }
+
+        function atjaunotPunkti() {
+            document.getElementById('punkti-tu').textContent = punktiTu;
+            document.getElementById('punkti-dators').textContent = punktiDators;
+        }
+
+        function zimetVisu() {
+            if (!spele) return;
+
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, c.width, c.height);
+
+            ctx.setLineDash([10, 10]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(200, 0);
+            ctx.lineTo(200, 300);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (aug && P.y > 0) P.y -= P.atrs;
+            if (lejup && P.y + P.h < c.height) P.y += P.atrs;
+
+            const dc = D.y + D.h / 2;
+            if (dc < B.y - 5) D.y += D.atrs;
+            else if (dc > B.y + 5) D.y -= D.atrs;
+            D.y = Math.max(0, Math.min(c.height - D.h, D.y));
+
+            B.x += B.dx;
+            B.y += B.dy;
+
+            if (B.y - B.r < 0 || B.y + B.r > c.height) B.dy *= -1;
+
+            if (B.x - B.r < P.x + P.w && B.y > P.y && B.y < P.y + P.h && B.dx < 0) {
+                B.dx *= -1.02;
+                B.dy += (B.y - (P.y + P.h / 2)) * 0.08;
+            }
+
+            if (B.x + B.r > D.x && B.y > D.y && B.y < D.y + D.h && B.dx > 0) {
+                B.dx *= -1.02;
+                B.dy += (B.y - (D.y + D.h / 2)) * 0.08;
+            }
+
+            B.dx = Math.max(-7, Math.min(7, B.dx));
+            B.dy = Math.max(-6, Math.min(6, B.dy));
+
+            if (B.x < 0) {
+                punktiDators++;
+                atjaunotPunkti();
+                atkartot();
+                return;
+            }
+            if (B.x > c.width) {
+                punktiTu++;
+                atjaunotPunkti();
+                atkartot();
+                return;
+            }
+
+            if (punktiTu >= 7) {
+                spele = false;
+                document.getElementById('zinojums').textContent = '🎉 Tu uzvarēji!';
+                return;
+            }
+            if (punktiDators >= 7) {
+                spele = false;
+                document.getElementById('zinojums').textContent = '💀 Dators uzvarēja!';
+                return;
+            }
+
+            ctx.fillStyle = '#667eea';
+            ctx.beginPath();
+            ctx.roundRect(P.x, P.y, P.w, P.h, 4);
+            ctx.fill();
+
+            ctx.fillStyle = '#f5576c';
+            ctx.beginPath();
+            ctx.roundRect(D.x, D.y, D.w, D.h, 4);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffd93d';
+            ctx.beginPath();
+            ctx.arc(B.x, B.y, B.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            animId = requestAnimationFrame(zimetVisu);
+        }
+
+        function atkartot() {
+            setTimeout(() => {
+                B.x = 200; B.y = 150;
+                B.dx = 2.5 * (Math.random() > 0.5 ? 1 : -1);
+                B.dy = 2 * (Math.random() > 0.5 ? 1 : -1);
+                zimetVisu();
+            }, 800);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowUp' || e.key === 'w') aug = true;
+            if (e.key === 'ArrowDown' || e.key === 's') lejup = true;
+        });
+        document.addEventListener('keyup', e => {
+            if (e.key === 'ArrowUp' || e.key === 'w') aug = false;
+            if (e.key === 'ArrowDown' || e.key === 's') lejup = false;
+        });
+
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText('Nospied "Sākt spēli"!', 200, 150);
+    </script>
+</body>
+</html>

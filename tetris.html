@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            background-image: url("https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px; z-index: 100;
+        }
+        .nav-logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 15px; opacity: 0.85; }
+        .nav-links a:hover { opacity: 1; }
+        .saturs {
+            background: rgba(255,255,255,0.92);
+            max-width: 420px;
+            margin: 100px auto 50px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 { color: #222; font-size: 26px; margin-bottom: 6px; }
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #444;
+        }
+        canvas {
+            border: 3px solid #667eea;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+            background: #1a1a2e;
+        }
+        .pogas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+            max-width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .poga {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transition: transform 0.1s;
+        }
+        .poga:active { transform: scale(0.9); }
+        .poga-garais {
+            grid-column: span 3;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: #1a1a1a;
+            transition: transform 0.1s;
+        }
+        .poga-garais:active { transform: scale(0.95); }
+        .btn {
+            display: block; width: 100%; padding: 12px;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-top: 12px; text-align: center; text-decoration: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; transition: transform 0.15s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        #game-over {
+            display: none;
+            background: rgba(244,67,54,0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .vadiba-info {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a class="nav-logo" href="index.html">🌿 Mana lapa</a>
+        <div class="nav-links">
+            <a href="index.html">Sākums</a>
+            <a href="par-mani.html">Par mani</a>
+            <a href="galerija.html">Galerija</a>
+        </div>
+    </nav>
+
+    <div class="saturs">
+        <h1>🧩 Tetris</h1>
+        <div class="info">
+            <span>Punkti: <b id="punkti">0</b></span>
+            <span>Līmenis: <b id="limenis">1</b></span>
+            <span>Rindas: <b id="rindas">0</b></span>
+        </div>
+        <canvas id="tetris" width="200" height="400"></canvas>
+        <div id="game-over">💀 Spēle beigusies!</div>
+        <div class="pogas">
+            <button class="poga" onclick="pagriezt()">🔄</button>
+            <button class="poga" onclick="kustities(-1, 0)">◀</button>
+            <button class="poga" onclick="kustities(1, 0)">▶</button>
+            <button class="poga-garais" onclick="kustities(0, 1)">▼ Ātrāk</button>
+            <button class="poga-garais" onclick="sakit()">▶ Sākt / Restartēt</button>
+        </div>
+        <p class="vadiba-info">Tastatūra: ← → ▼ pagriezt ar ↑</p>
+        <a href="index.html" class="btn">← Atpakaļ uz sākumu</a>
+    </div>
+
+    <script>
+        const audekls = document.getElementById('tetris');
+        const ctx = audekls.getContext('2d');
+        const PLATUMS = 10, AUGSTUMS = 20, IZMERS = 20;
+
+        const KRĀSAS = ['', '#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff9a3c','#c77dff','#00d4ff'];
+        const FIGURAS = [
+            [[1,1,1,1]],
+            [[1,1],[1,1]],
+            [[1,1,1],[0,1,0]],
+            [[1,1,1],[1,0,0]],
+            [[1,1,1],[0,0,1]],
+            [[1,1,0],[0,1,1]],
+            [[0,1,1],[1,1,0]]
+        ];
+
+        let laukums, figura, figX, figY, figKrasa, punkti, limenis, rindas, spele, intervals;
+
+        function sakit() {
+            laukums = Array.from({length: AUGSTUMS}, () => Array(PLATUMS).fill(0));
+            punkti = 0; limenis = 1; rindas = 0;
+            atjaunotInfo();
+            document.getElementById('game-over').style.display = 'none';
+            jaunaFigura();
+            clearInterval(intervals);
+            spele = true;
+            intervals = setInterval(solis, 500);
+        }
+
+        function jaunaFigura() {
+            const i = Math.floor(Math.random() * FIGURAS.length);
+            figura = FIGURAS[i].map(r => [...r]);
+            figKrasa = i + 1;
+            figX = Math.floor(PLATUMS / 2) - Math.floor(figura[0].length / 2);
+            figY = 0;
+            if (!var_kustities(0, 0)) {
+                spele = false;
+                clearInterval(intervals);
+                document.getElementById('game-over').style.display = 'block';
+            }
+        }
+
+        function var_kustities(dx, dy, fig = figura) {
+            for (let r = 0; r < fig.length; r++)
+                for (let c = 0; c < fig[r].length; c++)
+                    if (fig[r][c]) {
+                        const nx = figX + c + dx, ny = figY + r + dy;
+                        if (nx < 0 || nx >= PLATUMS || ny >= AUGSTUMS) return false;
+                        if (ny >= 0 && laukums[ny][nx]) return false;
+                    }
+            return true;
+        }
+
+        function kustities(dx, dy) {
+            if (!spele) return;
+            if (var_kustities(dx, dy)) { figX += dx; figY += dy; }
+            else if (dy) noliciet();
+            zimetVisu();
+        }
+
+        function pagriezt() {
+            if (!spele) return;
+            const pag = figura[0].map((_, i) => figura.map(r => r[i]).reverse());
+            if (var_kustities(0, 0, pag)) figura = pag;
+            zimetVisu();
+        }
+
+        function noliciet() {
+            for (let r = 0; r < figura.length; r++)
+                for (let c = 0; c < figura[r].length; c++)
+                    if (figura[r][c] && figY + r >= 0)
+                        laukums[figY + r][figX + c] = figKrasa;
+            dzestRindas();
+            jaunaFigura();
+        }
+
+        function dzestRindas() {
+            let skaits = 0;
+            for (let r = AUGSTUMS - 1; r >= 0; r--) {
+                if (laukums[r].every(c => c)) {
+                    laukums.splice(r, 1);
+                    laukums.unshift(Array(PLATUMS).fill(0));
+                    skaits++; r++;
+                }
+            }
+            if (skaits) {
+                rindas += skaits;
+                punkti += [0, 100, 300, 500, 800][skaits] * limenis;
+                limenis = Math.floor(rindas / 10) + 1;
+                clearInterval(intervals);
+                intervals = setInterval(solis, Math.max(100, 500 - limenis * 40));
+                atjaunotInfo();
+            }
+        }
+
+        function atjaunotInfo() {
+            document.getElementById('punkti').textContent = punkti;
+            document.getElementById('limenis').textContent = limenis;
+            document.getElementById('rindas').textContent = rindas;
+        }
+
+        function solis() { kustities(0, 1); }
+
+        function zimetVisu() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, audekls.width, audekls.height);
+
+            // Laukums
+            for (let r = 0; r < AUGSTUMS; r++)
+                for (let c = 0; c < PLATUMS; c++)
+                    if (laukums[r][c]) {
+                        ctx.fillStyle = KRĀSAS[laukums[r][c]];
+                        ctx.fillRect(c * IZMERS, r * IZMERS, IZMERS - 1, IZMERS - 1);
+                        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                        ctx.fillRect(c * IZMERS, r * IZMERS, IZMERS - 1, 4);
+                    }
+
+            // Aktīvā figura
+            if (figura)
+                for (let r = 0; r < figura.length; r++)
+                    for (let c = 0; c < figura[r].length; c++)
+                        if (figura[r][c]) {
+                            ctx.fillStyle = KRĀSAS[figKrasa];
+                            ctx.fillRect((figX + c) * IZMERS, (figY + r) * IZMERS, IZMERS - 1, IZMERS - 1);
+                            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                            ctx.fillRect((figX + c) * IZMERS, (figY + r) * IZMERS, IZMERS - 1, 4);
+                        }
+
+            // Režģis
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 0.5;
+            for (let r = 0; r < AUGSTUMS; r++) {
+                ctx.beginPath(); ctx.moveTo(0, r * IZMERS); ctx.lineTo(audekls.width, r * IZMERS); ctx.stroke();
+            }
+            for (let c = 0; c < PLATUMS; c++) {
+                ctx.beginPath(); ctx.moveTo(c * IZMERS, 0); ctx.lineTo(c * IZMERS, audekls.height); ctx.stroke();
+            }
+        }
+
+        // Tastatūra
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') kustities(-1, 0);
+            else if (e.key === 'ArrowRight') kustities(1, 0);
+            else if (e.key === 'ArrowDown') kustities(0, 1);
+            else if (e.key === 'ArrowUp') pagriezt();
+        });
+
+        spele = false;
+        zimetVisu();
+    </script>
+</body>
+</html>
